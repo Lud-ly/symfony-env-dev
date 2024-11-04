@@ -12,25 +12,21 @@ RUN apt-get update \
         wget \
         zip \
         curl \
-        docker.io \
+        libpng-dev \       
+        libjpeg-dev \    
+        libfreetype6-dev \ 
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# PHP Extensions
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN install-php-extensions \
-    bcmath \
-    gd \
-    intl \
-    pdo_pgsql \
-    zip
+# PHP Extensions installation
+RUN docker-php-ext-install bcmath gd intl pdo_pgsql zip
 
 # Install Node.js and npm
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
     && apt-get install -y nodejs
 
-# Composer
-COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Symfony CLI
 RUN wget https://get.symfony.com/cli/installer -O - | bash \
